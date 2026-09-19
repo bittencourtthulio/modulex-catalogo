@@ -1,0 +1,32 @@
+# Modulo desatualizado e pior que modulo nenhum: produz plano confiante e
+# errado (regra 8). Um cron mensal transforma "alguem devia revisar" em
+# issue com nome e prazo.
+name: vencimento de modulos
+
+on:
+  schedule:
+    - cron: "0 9 1 * *"   # todo dia 1, 09:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  vencidos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: listar e abrir issue de M3
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODULEX_CATALOGO_REPO: ${{ github.repository }}
+        run: |
+          python3 scripts/vencidos.py \
+            --catalogo docs/modulos \
+            --abrir-issue \
+            --repo "${{ github.repository }}"

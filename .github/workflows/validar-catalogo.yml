@@ -1,0 +1,71 @@
+# O contrato do modulex deixa de ser norma escrita e vira teste que reprova
+# merge. Este workflow vive no repositorio do catalogo; aqui ele roda contra
+# o catalogo semente em docs/modulos/ e contra o modulo zero em exemplos/.
+name: validar catalogo
+
+on:
+  pull_request:
+    paths: ["docs/modulos/**", "scripts/**", ".github/workflows/**"]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contrato:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # 1. o gate primeiro. Publicacao e irreversivel: se ha segredo no PR,
+      #    nada mais importa ate ele ser girado.
+      - name: gate de publicacao
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
+            MUDOU=$(git diff --name-only --diff-filter=ACMR \
+              "origin/${{ github.base_ref }}...HEAD" || true)
+          else
+            MUDOU=$(git ls-files 'docs/modulos/*')
+          fi
+          if [ -z "$MUDOU" ]; then echo "nada mudou"; exit 0; fi
+          echo "$MUDOU" | tr '\n' ' '
+          # shellcheck disable=SC2086
+          python3 scripts/gate_publicacao.py $MUDOU
+
+      - name: contrato dos MODULO.md
+        run: python3 scripts/validar_modulo.py --todos
+
+      - name: indice bate com os MODULO.md
+        run: python3 scripts/reindexar.py --conferir
+
+      # O termo do desfecho EXISTE sai do proprio indice, nunca fixo no
+      # workflow: um termo fixo quebra no dia em que um modulo novo passa a
+      # cobri-lo — foi o que aconteceu quando o nfse-municipal entrou e o
+      # teste ainda esperava "emitir nota fiscal" em NAO EXISTE.
+      - name: a M0 responde nos dois desfechos
+        run: |
+          set -euo pipefail
+          TERMO=$(python3 -c 'import json; m = json.load(open("docs/modulos/modulos.json"))["modulos"]; print(m[0]["problema"] if m else "")')
+          if [ -z "$TERMO" ]; then
+            echo "catalogo vazio: so o desfecho NAO EXISTE e testavel"
+          else
+            echo "EXISTE  <- $TERMO"
+            # grava e so entao procura: `| grep -q` fecha o pipe cedo e o
+            # SIGPIPE no python derruba o passo sob pipefail.
+            python3 scripts/buscar.py "$TERMO" > m0-existe.txt
+            grep -q "EXISTE:" m0-existe.txt
+          fi
+          # Nenhum modulo vai cobrir isto. Se um dia cobrir, o problema e outro.
+          python3 scripts/buscar.py "zzqx telepatia quantica impossivel" > m0-vazio.txt
+          grep -q "NAO EXISTE" m0-vazio.txt
+          rm -f m0-existe.txt m0-vazio.txt
