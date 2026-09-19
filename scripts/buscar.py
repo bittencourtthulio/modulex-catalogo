@@ -25,7 +25,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from _comum import carregar_json, normalizar, resolver_catalogo, vencido_em  # noqa: E402
+from _comum import (  # noqa: E402
+    carregar_json,
+    normalizar,
+    raiz_do_repo,
+    resolver_catalogo,
+    vencido_em,
+)
 
 # Peso por campo: o problema vale mais que o sinonimo, que vale mais que a
 # stack. E a ordem de busca de references/00-consulta.md.
@@ -156,8 +162,16 @@ def main(argv: list[str]) -> int:
         print("Mais de um modulo serve. O modulex lista e cala: a escolha e do")
         print("sprintx (F2/F3), com o stackx na mesa (regra 1).\n")
 
+    # Caminho relativo quando da, e o nome da variavel quando o catalogo
+    # esta fora do projeto. Nunca caminho absoluto, e nunca truncado: o
+    # degrau so torna visivel o "consultei catalogo velho" se o caminho
+    # impresso for o caminho de verdade.
+    try:
+        onde = pasta.resolve().relative_to(raiz_do_repo()).as_posix()
+    except ValueError:
+        onde = "$MODULEX_CATALOGO"
     print(
-        f"Catalogo: {pasta.as_posix().split('/')[-2] + '/' + pasta.name} (degrau {degrau}) "
+        f"Catalogo: {onde} (degrau {degrau}) "
         f"· {len(modulos)} modulo(s) · atualizado_em {dados.get('atualizado_em')}"
     )
     return 0
