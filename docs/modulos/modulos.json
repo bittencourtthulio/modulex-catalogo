@@ -9,6 +9,133 @@
   "atualizado_em": "2026-09-19",
   "modulos": [
     {
+      "id": "nfse-municipal",
+      "namespace": "publico",
+      "problema": "emitir nota fiscal de servico eletronica (NFS-e) em nome de um cliente, com cancelamento e PDF",
+      "sinonimos": {
+        "pt": [
+          "nota fiscal de servico",
+          "nfs-e",
+          "nfse",
+          "emitir nota fiscal",
+          "emissao de nota",
+          "nota fiscal eletronica de servico",
+          "nota de servico",
+          "rps",
+          "dps",
+          "iss",
+          "issqn",
+          "prefeitura",
+          "sistema nacional de nfs-e",
+          "danfse",
+          "cancelar nota fiscal",
+          "tomador",
+          "prestador",
+          "competencia",
+          "item da lista de servico",
+          "lc 116"
+        ],
+        "en": [
+          "service invoice",
+          "electronic invoice",
+          "municipal invoice",
+          "e-invoicing",
+          "tax invoice",
+          "invoice issuance",
+          "invoice cancellation"
+        ],
+        "fornecedores": [
+          "sefin-nacional",
+          "adn",
+          "abrasf"
+        ],
+        "casa": [
+          "emissao",
+          "transmitir",
+          "rejeicao",
+          "ambiente de homologacao",
+          "certificado a1",
+          "mtls",
+          "chave de acesso",
+          "serie",
+          "contador"
+        ]
+      },
+      "fatias": [
+        {
+          "slug": "nucleo",
+          "tipo": "obrigatoria",
+          "problema": "montar a declaracao, assinar, transmitir e guardar o resultado",
+          "cobre": "montagem do XML (DPS ou RPS), assinatura XML-DSig, transmissao com mTLS, parse da resposta, persistencia do emitido e do rejeitado, numeracao sequencial de RPS, homologacao e producao",
+          "nao_cobre": "apuracao de imposto; cadastro de servicos; emissao em lote; carta de correcao; substituicao automatica; conciliacao contabil; a tabela oficial de codigo de tributacao nacional nao e embarcada",
+          "esforco": "NAO DETERMINADO"
+        },
+        {
+          "slug": "cancelamento",
+          "tipo": "opcional",
+          "problema": "cancelar uma NFS-e ja emitida",
+          "cobre": "pedido de cancelamento assinado, transmissao, afericao de vinculo entre evento e nota",
+          "nao_cobre": "prazo legal de cancelamento por municipio; substituicao de nota; estorno financeiro",
+          "esforco": "NAO DETERMINADO"
+        },
+        {
+          "slug": "danfse",
+          "tipo": "opcional",
+          "problema": "gerar o PDF da nota para o tomador",
+          "cobre": "PDF a partir do XML autorizado, com caminho alternativo quando o gerador principal falha",
+          "nao_cobre": "layout customizado por municipio ou marca; envio por email como ato fiscal; assinatura do PDF",
+          "esforco": "NAO DETERMINADO"
+        },
+        {
+          "slug": "reforma-tributaria",
+          "tipo": "opcional",
+          "problema": "os campos de IBS/CBS e o codigo NBS na declaracao",
+          "cobre": "grupo IBS/CBS, codigo NBS, aliquotas apuradas",
+          "nao_cobre": "o calculo dos novos tributos; a transicao de regime; qualquer decisao sobre o que e devido — o modulo transporta valores, nao os apura",
+          "esforco": "NAO DETERMINADO"
+        },
+        {
+          "slug": "multi-municipio",
+          "tipo": "opcional",
+          "problema": "atender mais de um municipio, com protocolos diferentes",
+          "cobre": "tabela de municipios com protocolo, roteamento por codigo IBGE, heranca de protocolo quando o dado dinamico vem incompleto",
+          "nao_cobre": "o cadastro dos municipios em si — municipio novo nao e configuracao, e integracao: cada um tem URL, versao e protocolo proprios",
+          "esforco": "NAO DETERMINADO"
+        }
+      ],
+      "repo": "https://github.com/bittencourtthulio/ExpxNFe",
+      "stack_essencial": [
+        "certificado digital A1 em pfx acessivel pelo processo que transmite",
+        "runtime com mTLS e criptografia nativa no servidor",
+        "assinatura XML-DSig RSA-SHA1 com canonicalizacao C14N e namespace herdado",
+        "declaracao assinada vai comprimida e em base64 dentro de envelope JSON",
+        "numeracao de RPS sequencial sob transacao, sem buraco e sem repeticao",
+        "persistir o XML transmitido e a resposta bruta da rejeicao",
+        "todo texto do XML em ASCII, no protocolo ABRASF"
+      ],
+      "stack_herdada": [
+        "next.js 15 app router + typescript + turborepo",
+        "postgres com prisma",
+        "supabase para auth e storage do certificado",
+        "zod, shadcn/ui, tailwind",
+        "envelope de resposta sucesso-dados-erro",
+        "coluna de tenancy software_house_id",
+        "api key guardada como hash sha-256",
+        "interface em pt-BR"
+      ],
+      "pre_requisitos_bloqueantes": [
+        "certificado digital A1 valido do prestador, com a senha",
+        "inscricao municipal ativa do prestador no municipio de prestacao",
+        "o municipio de prestacao mapeado: codigo IBGE, protocolo e endpoint",
+        "runtime de servidor com saida para a internet e suporte a mTLS",
+        "banco para as notas, os XMLs e o contador de numeracao"
+      ],
+      "verificado_em": "2026-09-19",
+      "verificado_contra": "emissao real no SEFIN Nacional em producao, municipio de Cabo Frio/RJ, entre 2026-07 e 2026-09",
+      "extraido_de": "ExpxNFe — plataforma multi-tenant de emissao fiscal, com NFS-e em producao",
+      "status": "ativo"
+    },
+    {
       "id": "whatsapp-uazapi",
       "namespace": "publico",
       "problema": "atender cliente por WhatsApp, com caixa de entrada compartilhada pela equipe",
@@ -143,133 +270,6 @@
       "verificado_em": "2026-08-24",
       "verificado_contra": "documentacao publica da uazapi em 2026-08-24",
       "extraido_de": "Expx Flow — CRM multi-tenant com modulo WhatsApp em producao",
-      "status": "ativo"
-    },
-    {
-      "id": "nfse-municipal",
-      "namespace": "publico",
-      "problema": "emitir nota fiscal de servico eletronica (NFS-e) em nome de um cliente, com cancelamento e PDF",
-      "sinonimos": {
-        "pt": [
-          "nota fiscal de servico",
-          "nfs-e",
-          "nfse",
-          "emitir nota fiscal",
-          "emissao de nota",
-          "nota fiscal eletronica de servico",
-          "nota de servico",
-          "rps",
-          "dps",
-          "iss",
-          "issqn",
-          "prefeitura",
-          "sistema nacional de nfs-e",
-          "danfse",
-          "cancelar nota fiscal",
-          "tomador",
-          "prestador",
-          "competencia",
-          "item da lista de servico",
-          "lc 116"
-        ],
-        "en": [
-          "service invoice",
-          "electronic invoice",
-          "municipal invoice",
-          "e-invoicing",
-          "tax invoice",
-          "invoice issuance",
-          "invoice cancellation"
-        ],
-        "fornecedores": [
-          "sefin-nacional",
-          "adn",
-          "abrasf"
-        ],
-        "casa": [
-          "emissao",
-          "transmitir",
-          "rejeicao",
-          "ambiente de homologacao",
-          "certificado a1",
-          "mtls",
-          "chave de acesso",
-          "serie",
-          "contador"
-        ]
-      },
-      "fatias": [
-        {
-          "slug": "nucleo",
-          "tipo": "obrigatoria",
-          "problema": "montar a declaracao, assinar, transmitir e guardar o resultado",
-          "cobre": "montagem do XML (DPS ou RPS), assinatura XML-DSig, transmissao com mTLS, parse da resposta, persistencia do emitido e do rejeitado, numeracao sequencial de RPS, homologacao e producao",
-          "nao_cobre": "apuracao de imposto; cadastro de servicos; emissao em lote; carta de correcao; substituicao automatica; conciliacao contabil; a tabela oficial de codigo de tributacao nacional nao e embarcada",
-          "esforco": "NAO DETERMINADO"
-        },
-        {
-          "slug": "cancelamento",
-          "tipo": "opcional",
-          "problema": "cancelar uma NFS-e ja emitida",
-          "cobre": "pedido de cancelamento assinado, transmissao, afericao de vinculo entre evento e nota",
-          "nao_cobre": "prazo legal de cancelamento por municipio; substituicao de nota; estorno financeiro",
-          "esforco": "NAO DETERMINADO"
-        },
-        {
-          "slug": "danfse",
-          "tipo": "opcional",
-          "problema": "gerar o PDF da nota para o tomador",
-          "cobre": "PDF a partir do XML autorizado, com caminho alternativo quando o gerador principal falha",
-          "nao_cobre": "layout customizado por municipio ou marca; envio por email como ato fiscal; assinatura do PDF",
-          "esforco": "NAO DETERMINADO"
-        },
-        {
-          "slug": "reforma-tributaria",
-          "tipo": "opcional",
-          "problema": "os campos de IBS/CBS e o codigo NBS na declaracao",
-          "cobre": "grupo IBS/CBS, codigo NBS, aliquotas apuradas",
-          "nao_cobre": "o calculo dos novos tributos; a transicao de regime; qualquer decisao sobre o que e devido — o modulo transporta valores, nao os apura",
-          "esforco": "NAO DETERMINADO"
-        },
-        {
-          "slug": "multi-municipio",
-          "tipo": "opcional",
-          "problema": "atender mais de um municipio, com protocolos diferentes",
-          "cobre": "tabela de municipios com protocolo, roteamento por codigo IBGE, heranca de protocolo quando o dado dinamico vem incompleto",
-          "nao_cobre": "o cadastro dos municipios em si — municipio novo nao e configuracao, e integracao: cada um tem URL, versao e protocolo proprios",
-          "esforco": "NAO DETERMINADO"
-        }
-      ],
-      "repo": "https://github.com/bittencourtthulio/ExpxNFe",
-      "stack_essencial": [
-        "certificado digital A1 em pfx acessivel pelo processo que transmite",
-        "runtime com mTLS e criptografia nativa no servidor",
-        "assinatura XML-DSig RSA-SHA1 com canonicalizacao C14N e namespace herdado",
-        "declaracao assinada vai comprimida e em base64 dentro de envelope JSON",
-        "numeracao de RPS sequencial sob transacao, sem buraco e sem repeticao",
-        "persistir o XML transmitido e a resposta bruta da rejeicao",
-        "todo texto do XML em ASCII, no protocolo ABRASF"
-      ],
-      "stack_herdada": [
-        "next.js 15 app router + typescript + turborepo",
-        "postgres com prisma",
-        "supabase para auth e storage do certificado",
-        "zod, shadcn/ui, tailwind",
-        "envelope de resposta sucesso-dados-erro",
-        "coluna de tenancy software_house_id",
-        "api key guardada como hash sha-256",
-        "interface em pt-BR"
-      ],
-      "pre_requisitos_bloqueantes": [
-        "certificado digital A1 valido do prestador, com a senha",
-        "inscricao municipal ativa do prestador no municipio de prestacao",
-        "o municipio de prestacao mapeado: codigo IBGE, protocolo e endpoint",
-        "runtime de servidor com saida para a internet e suporte a mTLS",
-        "banco para as notas, os XMLs e o contador de numeracao"
-      ],
-      "verificado_em": "2026-09-19",
-      "verificado_contra": "emissao real no SEFIN Nacional em producao, municipio de Cabo Frio/RJ, entre 2026-07 e 2026-09",
-      "extraido_de": "ExpxNFe — plataforma multi-tenant de emissao fiscal, com NFS-e em producao",
       "status": "ativo"
     }
   ]

@@ -5,6 +5,7 @@ criado_em: 2026-09-02
 atualizado_em: 2026-09-19
 total_modulos: 2
 ativos: 2
+candidatos: 0
 obsoletos: 0
 vencidos: 0
 ---
@@ -20,8 +21,8 @@ descoberta.
 
 | id | problema | fatias | fornecedor | esforco | verificado_em | status |
 |----|----------|--------|------------|---------|---------------|--------|
-| `whatsapp-uazapi` | atender cliente por WhatsApp, com caixa de entrada compartilhada pela equipe | 6 (nucleo + 5 opcionais) | uazapi | NAO DETERMINADO | 2026-08-24 | ativo |
-| `nfse-municipal` | emitir nota fiscal de serviço eletrônica (NFS-e) em nome de um cliente, com cancelamento e PDF | 5 (nucleo + 4 opcionais) | sefin-nacional / abrasf | NAO DETERMINADO | 2026-09-19 | ativo |
+| `nfse-municipal` | emitir nota fiscal de servico eletronica (NFS-e) em nome de um cliente, com cancelamento e PDF | 5 (nucleo + 4 opcionais) | sefin-nacional, adn, abrasf | NAO DETERMINADO | 2026-09-19 | ativo |
+| `whatsapp-uazapi` | atender cliente por WhatsApp, com caixa de entrada compartilhada pela equipe | 6 (nucleo + 5 opcionais) | uazapi, api4com, openrouter | NAO DETERMINADO | 2026-08-24 | ativo |
 
 ## Indicadores
 
