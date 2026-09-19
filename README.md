@@ -62,6 +62,12 @@ dizem a verdade, e se o "não cobre" está honesto.**
 - **Artefato bruto.** O código fica no repositório do módulo, apontado pelo
   campo `repo`. O que viaja é o conhecimento.
 
+Quando a origem é **privada e continua privada**, o módulo se basta: o catálogo
+carrega a estrutura, o `repo` aponta para o próprio catálogo, e a seção 10 marca
+cada linha como `nao distribuido`. Consultar e implementar a partir dele não
+exige acesso nenhum à origem. Não há o que copiar — o que ele poupa é a
+descoberta, que é a maior parte do custo.
+
 O que sobe é **extraído, nunca raspado**: anonimizar falha aberto — o que o
 padrão não pegou vai junto. Extrair falha fechado — o que não está no schema
 nunca foi copiado.

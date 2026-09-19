@@ -6,7 +6,7 @@ namespace: publico
 problema: emitir nota fiscal de servico eletronica (NFS-e) em nome de um cliente, com cancelamento e PDF
 fornecedores: [sefin-nacional, adn, abrasf]
 fatias: [nucleo, cancelamento, danfse, reforma-tributaria, multi-municipio]
-repo: https://github.com/bittencourtthulio/ExpxNFe
+repo: https://github.com/bittencourtthulio/modulex-catalogo/tree/main/docs/modulos/mod/publico/nfse-municipal
 stack_essencial: [certificado digital A1 em pfx acessivel pelo processo que transmite, runtime com mTLS e criptografia nativa no servidor, assinatura XML-DSig RSA-SHA1 com canonicalizacao C14N e namespace herdado, declaracao assinada vai comprimida e em base64 dentro de envelope JSON, "numeracao de RPS sequencial sob transacao, sem buraco e sem repeticao", persistir o XML transmitido e a resposta bruta da rejeicao, "todo texto do XML em ASCII, no protocolo ABRASF"]
 stack_herdada: [next.js 15 app router + typescript + turborepo, postgres com prisma, supabase para auth e storage do certificado, "zod, shadcn/ui, tailwind", envelope de resposta sucesso-dados-erro, coluna de tenancy software_house_id, api key guardada como hash sha-256, interface em pt-BR]
 esforco: NAO DETERMINADO
@@ -232,21 +232,36 @@ documentação.
 
 ## 10. Inventario de artefatos
 
-| Artefato | Quantos | Onde | Marca |
-|---|---|---|---|
-| pacote do domínio NFS-e (emissão, cancelamento, consulta, substituição, parsers, assinatura, clients, DANFSE) | 52 arquivos | `packages/nfse-core/` | rodou em produção |
-| testes automatizados do pacote | 20 | `packages/nfse-core/src/**/__tests__/` | rodou em produção |
-| rotas da API REST de NFS-e | 6 | `apps/web/app/api/v1/nfse/` | rodou em produção |
-| telas e formulário de serviços | — | `apps/web/app/(portal)/servicos/` | rodou em produção |
-| migrações relacionadas a NFS-e e municípios | 2 | `apps/web/migrations/` | rodou em produção |
-| modelos de dados `MunicipioNfse` e `SerieContador` | 2 | `packages/database/prisma/schema.prisma` | rodou em produção |
-| guia do integrador — Sistema Nacional | 1 | `docs/integrador-nfse-nacional.md` | documentação, validada contra emissão real |
-| guia do integrador — IBS/CBS | 1 | `docs/integrador-nfse-ibs-cbs.md` | documentação |
-| script de emissão real em homologação | 1 | `packages/nfse-core/scripts/` | ferramenta de diagnóstico |
+**Este e um modulo de conhecimento, nao de codigo. Nenhum artefato e
+distribuido.**
 
-**Marca de procedência:** o código rodou em produção emitindo NFS-e reais em
-Cabo Frio/RJ. O que está marcado como documentação foi escrito **depois** da
-emissão real e conferido contra ela.
+O sistema de origem e privado e continua privado. O que foi catalogado aqui e
+a **estrutura** — o contrato do protocolo, a ordem das operacoes, a cadeia de
+falha e as rejeicoes reais — e essa estrutura e auto-suficiente: consultar,
+planejar e implementar a partir deste modulo **nao exige acesso nenhum** ao
+repositorio de origem.
+
+O inventario abaixo e **evidencia de procedencia**, nao lista de copia. Ele
+diz de quanto codigo em producao este conhecimento foi destilado:
+
+| Area | Quantos | Marca |
+|---|---|---|
+| pacote de dominio NFS-e: emissao, cancelamento, consulta, substituicao, parsers, assinatura, clients, DANFSE | 52 arquivos | rodou em producao · **nao distribuido** |
+| testes automatizados do pacote | 20 | rodou em producao · **nao distribuido** |
+| rotas de API REST de NFS-e | 6 | rodou em producao · **nao distribuido** |
+| telas e formulario de servicos | — | rodou em producao · **nao distribuido** |
+| migracoes de NFS-e e municipios | 2 | rodou em producao · **nao distribuido** |
+| modelos de dados de municipio e de contador de serie | 2 | rodou em producao · **nao distribuido** |
+| guias do integrador, escritos **depois** da emissao real e conferidos contra ela | 2 | documentacao · **nao distribuido** |
+
+**O que isso muda para quem planeja:** a regra "o artefato se copia, o plano se
+adapta" so tem uma metade aqui. Nao ha o que copiar — a F6 constroi a partir do
+plano da secao 9 e das armadilhas da secao 11, sob TDD, como construiria sem
+modulo nenhum. O que o modulo poupa e a **descoberta**: o contrato do protocolo,
+a ordem de assinatura, o que o validador rejeita e por que. Isso e a maior parte
+do custo, e e o que nao se le em documentacao oficial.
+
+Planejar copia de artefato daqui e planejar sobre algo que nunca vai chegar.
 
 ## 11. Cadeia de falha e armadilhas conhecidas
 
@@ -399,7 +414,9 @@ oficial**, e cada um custou pelo menos uma rejeição em produção para aparece
 
 | Campo | Valor |
 |---|---|
-| **Sistema de origem** | ExpxNFe — plataforma multi-tenant de emissão fiscal, open-source e auto-hospedável |
+| **Sistema de origem** | ExpxNFe — plataforma multi-tenant de emissão fiscal. **Repositório privado, e assim permanece** |
+| **Acesso necessário à origem** | **nenhum.** O que foi catalogado é a estrutura, e ela é auto-suficiente: o módulo se explica sozinho |
+| **Artefatos distribuídos** | **nenhum.** Módulo de conhecimento — ver a ressalva da seção 10 |
 | **Rodou em produção?** | **Sim.** NFS-e reais emitidas em Cabo Frio/RJ |
 | **Período observado** | de 2026-07 (integração ABRASF) a 2026-09 |
 | **Marco de referência** | 2026-08-03 — a migração do município para o Sistema Nacional, por ato regulatório, e a primeira emissão real nesse protocolo |

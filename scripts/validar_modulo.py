@@ -244,6 +244,31 @@ def validar(caminho: Path, rep: Relatorio) -> None:
                 "de origem (regra 3). Modulo sem essa separacao injeta convencao alheia.",
             )
 
+    # D20: modulo cujo `repo` aponta para o proprio catalogo e modulo de
+    # conhecimento — a origem e privada e nada e distribuido. Declarar
+    # artefato "rodou em producao" sem dizer que ele nao viaja faz a F3
+    # planejar copia de algo que nunca chega.
+    if 10 in secoes and "modulex-catalogo" in str(fm.get("repo", "")):
+        inv = normalizar(secoes[10])
+        if "producao" in inv and "nao distribuido" not in inv:
+            rep.erro(
+                "artefato-prometido-e-nao-distribuido",
+                f"{onde}:secao 10",
+                "o `repo` aponta para o proprio catalogo, entao nao ha artefato a "
+                "baixar — mas a secao 10 marca artefato como `rodou em producao` "
+                "sem dizer `nao distribuido`. A F3 planejaria copia de algo que "
+                "nunca chega (D20). Marque cada linha, e diga na secao 14 que a "
+                "origem e privada e que nenhum acesso a ela e necessario.",
+            )
+        if 14 in secoes and "privad" not in normalizar(secoes[14]):
+            rep.aviso(
+                "origem-privada-nao-declarada",
+                f"{onde}:secao 14",
+                "modulo hospedado no catalogo e modulo de conhecimento: a secao 14 "
+                "deve dizer que a origem e privada e que nenhum acesso a ela e "
+                "necessario (D20).",
+            )
+
     # todo NAO DETERMINADO tem contrapartida na secao 13.
     com_nd = sorted(n for n, txt in secoes.items() if n != 13 and valores_nd(txt))
     if str(fm.get("esforco", "")).strip() == NAO_DETERMINADO and 8 not in com_nd:
