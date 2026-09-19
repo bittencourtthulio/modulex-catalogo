@@ -203,17 +203,37 @@ def validar(caminho: Path, rep: Relatorio) -> None:
     # derivado dele, e quem consulta sem abrir o MODULO.md ve menos do que
     # o modulo sabe.
     if 6 in secoes:
-        linhas6 = [l for l in secoes[6].splitlines() if l.strip().startswith("|")]
-        itens6 = max(0, len([l for l in linhas6 if not set(l) <= set("|- ")]) - 2)
-        declarados = len(fm.get("stack_essencial") or []) + len(fm.get("stack_herdada") or [])
-        if itens6 and declarados < itens6 * 0.8:
-            rep.aviso(
-                "frontmatter-mais-pobre-que-a-secao-6",
-                f"{onde}:frontmatter",
-                f"a secao 6 lista ~{itens6} item(ns) e o frontmatter declara "
-                f"{declarados}. O indice deriva do frontmatter: quem consulta sem "
-                "abrir o MODULO.md veria menos do que o modulo sabe.",
-            )
+        # Por coluna, nunca pelo total: uma coluna curta compensada por outra
+        # longa passa no total e esconde o defeito. Foi o que aconteceu no
+        # nfse-municipal — 5 essenciais declarados para 7 descritos, com a
+        # coluna herdada partida em 12 para 8.
+        linhas6 = secoes[6].splitlines()
+        # O corte e no TITULO da subsecao, nunca numa linha qualquer que
+        # contenha "herdad": um item essencial do nfse-municipal diz
+        # "com o namespace herdado", e cortar ali parte a tabela ao meio.
+        corte = next(
+            (
+                i for i, l in enumerate(linhas6)
+                if l.lstrip().startswith("#") and "herdad" in normalizar(l)
+            ),
+            len(linhas6),
+        )
+        for chave, trecho, rotulo in (
+            ("stack_essencial", linhas6[:corte], "essencial"),
+            ("stack_herdada", linhas6[corte:], "herdada"),
+        ):
+            linhas = [l for l in trecho if l.strip().startswith("|")]
+            itens = max(0, len([l for l in linhas if not set(l) <= set("|- ")]) - 1)
+            declarados = len(fm.get(chave) or [])
+            if itens and declarados < itens:
+                rep.aviso(
+                    "frontmatter-mais-pobre-que-a-secao-6",
+                    f"{onde}:frontmatter",
+                    f"a coluna {rotulo} da secao 6 descreve {itens} item(ns) e "
+                    f"`{chave}` declara {declarados}. O indice deriva do "
+                    "frontmatter: quem consulta sem abrir o MODULO.md veria menos "
+                    "do que o modulo sabe.",
+                )
 
         corpo6 = normalizar(secoes[6])
         if "essencial" not in corpo6 or "herdad" not in corpo6:
